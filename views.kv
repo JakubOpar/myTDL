@@ -1,0 +1,94 @@
+#:kivy 2.1.0
+
+<MainMenu>:
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        padding: 20
+
+        Label:
+            text: "Menu główne"
+            font_size: 24
+
+        Button:
+            text: "Dodaj kategorię"
+            on_press: app.show_add_category_screen()
+
+        Button:
+            text: "Usuń kategorię"
+            on_press: app.show_delete_category_screen()
+
+        Button:
+            text: "Przeglądaj kategorie"
+            on_press: app.show_category_list_screen()
+
+        Button:
+            text: "Wyjdź"
+            on_press: app.stop()
+
+
+<AddCategoryScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        padding: 20
+
+        Label:
+            text: "Dodaj nową kategorię"
+            font_size: 20
+
+        TextInput:
+            id: category_name_input
+            hint_text: "Wprowadź nazwę kategorii"
+
+        Button:
+            text: "Dodaj kategorię"
+            on_press: app.add_category(category_name_input.text)
+
+        Button:
+            text: "Powrót do menu"
+            on_press: app.show_main_menu()
+
+<DeleteCategoryScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        padding: 20
+
+        Label:
+            text: "Usuń kategorię"
+            font_size: 20
+
+        Spinner:
+            id: category_spinner
+            text: "Wybierz kategorię"
+            values: app.get_category_list()
+
+        Button:
+            text: "Usuń kategorię"
+            on_press: app.delete_category(category_spinner.text)
+
+        Button:
+            text: "Powrót do menu"
+            on_press: app.show_main_menu()
+
+<CategoryListScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        padding: 20
+
+        Label:
+            text: "Lista kategorii"
+            font_size: 20
+
+        ScrollView:
+            BoxLayout:
+                id: category_list
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+
+        Button:
+            text: "Powrót do menu"
+            on_press: app.show_main_menu()
