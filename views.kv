@@ -7,25 +7,8 @@
         padding: 20
 
         Label:
-            text: "Menu główne"
+            text: "Ładowanie aplikacji..."
             font_size: 24
-
-        Button:
-            text: "Dodaj kategorię"
-            on_press: app.show_add_category_screen()
-
-        Button:
-            text: "Usuń kategorię"
-            on_press: app.show_delete_category_screen()
-
-        Button:
-            text: "Przeglądaj kategorie"
-            on_press: app.show_category_list_screen()
-
-        Button:
-            text: "Wyjdź"
-            on_press: app.stop()
-
 
 <AddCategoryScreen>:
     BoxLayout:
@@ -72,16 +55,35 @@
             text: "Powrót do menu"
             on_press: app.show_main_menu()
 
-
 <CategoryListScreen>:
     BoxLayout:
         orientation: 'vertical'
         spacing: 10
         padding: 20
 
-        Label:
-            text: "Lista kategorii"
-            font_size: 20
+        BoxLayout:
+            size_hint_y: None
+            height: 60  # CATEGORY_HEIGHT
+            spacing: 10  # CATEGORY_SPACING
+
+            Label:
+                size_hint_x: 0.6  # Proporcje takie same jak w Pythonie
+
+            Button:
+                text: "+"
+                size_hint_x: None
+                width: 60  # BUTTON_WIDTH
+                height: 60  # Dopasowane do kategorii
+                background_color: 0, 1, 0, 1
+                on_press: app.show_add_category_screen()
+
+            Button:
+                text: "S"
+                size_hint_x: None
+                width: 60  # BUTTON_WIDTH
+                height: 60  # Dopasowane do kategorii
+                background_color: 1, 1, 0, 1
+                on_press: app.show_search_screen()
 
         ScrollView:
             BoxLayout:
@@ -89,10 +91,7 @@
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-
-        Button:
-            text: "Powrót do menu"
-            on_press: app.show_main_menu()
+                spacing: 10  # CATEGORY_SPACING
 
 
 

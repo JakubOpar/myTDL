@@ -91,6 +91,7 @@ def get_categories():
     cursor.execute('SELECT * FROM categories')
     categories = cursor.fetchall()
     conn.close()
+    print("Pobrane kategorie z bazy danych:", categories)  # Debugowanie
     return categories
 
 
@@ -193,3 +194,4 @@ def delete_task(task_id):
     cursor.execute('DELETE FROM tasks WHERE id = ?', (task_id,))
     conn.commit()
     conn.close()
+
