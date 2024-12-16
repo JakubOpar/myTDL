@@ -93,5 +93,18 @@
                 height: self.minimum_height
                 spacing: 10  # CATEGORY_SPACING
 
+<LoadingScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 20
+        padding: 20
+        Label:
+            text: "Ładowanie..."
+            font_size: 24
+        ProgressBar:
+            max: 100
+            value: 50
+
+
 
 

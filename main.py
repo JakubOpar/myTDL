@@ -4,6 +4,7 @@ from database import initialize_database, add_category, delete_category, get_cat
 from kivy.lang import Builder
 from kivy.core.window import Window
 from dynamic_categories import generate_categories
+from kivy.clock import Clock
 
 
 Window.size = (450, 600)
@@ -32,6 +33,10 @@ class TaskManagementScreen(Screen):
     pass
 
 
+class LoadingScreen(Screen):
+    pass
+
+
 class TaskManagerApp(App):
     def build(self):
         print("Inicjalizacja bazy danych...")
@@ -43,22 +48,22 @@ class TaskManagerApp(App):
         Builder.load_file("views.kv")
 
         # Dodanie ekranów do ScreenManager
+        self.sm.add_widget(LoadingScreen(name='loading'))
+        print("LoadingScreen załadowane.")
         self.sm.add_widget(MainMenu(name='main_menu'))
         print("MainMenu załadowane.")
         self.sm.add_widget(AddCategoryScreen(name='add_category'))
-        print("AddCategoryScreen załadowane.")
         self.sm.add_widget(DeleteCategoryScreen(name='delete_category'))
-        print("DeleteCategoryScreen załadowane.")
         self.sm.add_widget(CategoryListScreen(name='category_list'))
-        print("CategoryListScreen załadowane.")
+        self.sm.add_widget(TaskManagementScreen(name='task_management'))
 
-        # Debugowanie: Sprawdzenie dodanych ekranów
         print("Dodane ekrany:", [screen.name for screen in self.sm.screens])
 
-        self.sm.current = 'main_menu'  # Ustawienie ekranu początkowego
+        # Ustaw ekran ładowania jako początkowy
+        self.sm.current = 'loading'
 
-        # Automatyczne przejście na ekran kategorii po ładowaniu
-        self.show_category_list_screen()
+        # Po opóźnieniu przejdź na główny ekran
+        Clock.schedule_once(lambda dt: self.show_category_list_screen(), 2)
 
         return self.sm
 
@@ -78,6 +83,12 @@ class TaskManagerApp(App):
         screen.ids.category_spinner.text = "Wybierz kategorię"
 
     def show_category_list_screen(self):
+        print("Przełączanie na ekran ładowania...")
+        self.sm.current = 'loading'
+
+        Clock.schedule_once(lambda dt: self._load_category_list(), 1)
+
+    def _load_category_list(self):
         print("Wywołanie show_category_list_screen...")  # Debugowanie
         self.sm.current = 'category_list'
         category_list_layout = self.sm.get_screen('category_list').ids.category_list
@@ -102,20 +113,27 @@ class TaskManagerApp(App):
             print("Nazwa kategorii nie może być pusta.")
             return
         try:
-            add_category(name)
-            print(f"Kategoria '{name}' została dodana.")
-            # Powrót do listy kategorii i jej odświeżenie
-            self.show_category_list_screen()
+            self.sm.current = 'loading'
+            Clock.schedule_once(lambda dt: self._add_category_logic(name), 1)
         except ValueError as e:
             print(f"Error: {e}")
 
+    def _add_category_logic(self, name):
+        add_category(name)
+        print(f"Kategoria '{name}' została dodana.")
+        self.show_category_list_screen()
+
     def delete_category(self, name):
         try:
-            delete_category(name)
-            print(f"Kategoria '{name}' została usunięta.")
-            self.show_main_menu()
+            self.sm.current = 'loading'
+            Clock.schedule_once(lambda dt: self._delete_category_logic(name), 1)
         except ValueError as e:
             print(f"Error: {e}")
+
+    def _delete_category_logic(self, name):
+        delete_category(name)
+        print(f"Kategoria '{name}' została usunięta.")
+        self.show_category_list_screen()
 
     def manage_tasks(self, category_name):
         print(f"Zarządzanie zadaniami dla kategorii: {category_name}")
