@@ -13,24 +13,85 @@
 <AddCategoryScreen>:
     BoxLayout:
         orientation: 'vertical'
-        spacing: 10
-        padding: 20
+        spacing: 20
+        padding: 30
+
+        Widget:
+            size_hint_y: 0
 
         Label:
             text: "Dodaj nową kategorię"
-            font_size: 20
+            font_size: 24
+            size_hint_y: None
+            height: 50
 
-        TextInput:
-            id: category_name_input
-            hint_text: "Wprowadź nazwę kategorii"
+        BoxLayout:
+            size_hint_y: None
+            height: 65
+            size_hint_x: 0.7  # Skalowanie szerokości do ekranu
+            pos_hint: {"center_x": 0.5}  # Wycentrowanie
+
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1  # Białe tło pola tekstowego
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [10, 10, 10, 10]
+
+            TextInput:
+                id: category_name_input
+                hint_text: "Wprowadź nazwę kategorii"
+                font_size: 18
+                foreground_color: 0, 0, 0, 1
+                background_color: 0, 0, 0, 0
+                size_hint_x: 1  # Dopasowanie do szerokości kontenera
+                height: 60
+                multiline: False  # Zapobiega przechodzeniu do nowej linii
+                padding: [15, 15, 15, 15]
+                halign: "center"  # Wyśrodkowanie poziome
+                valign: "middle"  # Wyśrodkowanie pionowe
+                text_size: self.size  # Tekst dostosowuje się do wielkości pola
+
+        Widget:
+            size_hint_y: 1
 
         Button:
-            text: "Dodaj kategorię"
+            text: "+"
+            size_hint: None, None
+            width: 150
+            height: 150
+            pos_hint: {"center_x": 0.5}
+            background_color: 0, 0, 0, 0
             on_press: app.add_category(category_name_input.text)
 
+            canvas.before:
+                Color:
+                    rgba: 0.3, 0.7, 1, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [15, 15, 15, 15]
+
+        Widget:
+            size_hint_y: 0.2
+
         Button:
-            text: "Powrót do menu"
+            text: "P"
+            size_hint: None, None
+            width: 150
+            height: 150
+            pos_hint: {"center_x": 0.5}
+            background_color: 0, 0, 0, 0
             on_press: app.show_main_menu()
+
+            canvas.before:
+                Color:
+                    rgba: 0.1, 0.5, 1, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [15, 15, 15, 15]
 
 <DeleteCategoryScreen>:
     BoxLayout:

@@ -68,7 +68,8 @@ class TaskManagerApp(App):
         return self.sm
 
     def show_main_menu(self):
-        self.sm.current = 'main_menu'
+        print("Przechodzenie do ekranu kategorii...")
+        self.show_category_list_screen()
 
     def show_add_category_screen(self):
         self.sm.current = 'add_category'
@@ -87,11 +88,18 @@ class TaskManagerApp(App):
         self.sm.current = 'loading'
 
         Clock.schedule_once(lambda dt: self._load_category_list(), 1)
+        print("Ekran ładowania aktywowany, zaraz załadujemy listę kategorii.")
 
     def _load_category_list(self):
         print("Wywołanie show_category_list_screen...")  # Debugowanie
         self.sm.current = 'category_list'
-        category_list_layout = self.sm.get_screen('category_list').ids.category_list
+
+        try:
+            category_list_layout = self.sm.get_screen('category_list').ids.category_list
+        except Exception as e:
+            print("Błąd przy pobieraniu ekranu kategorii:", e)
+            return
+
         print("Pobrano layout kategorii:", category_list_layout)  # Debugowanie
 
         categories = [category[1] for category in get_categories()]
