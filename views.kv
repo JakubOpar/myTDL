@@ -63,35 +63,54 @@
 
         BoxLayout:
             size_hint_y: None
-            height: 60  # CATEGORY_HEIGHT
-            spacing: 10  # CATEGORY_SPACING
+            height: 60
+            spacing: 10
 
             Label:
-                size_hint_x: 0.6  # Proporcje takie same jak w Pythonie
+                size_hint_x: 0.6
 
             Button:
                 text: "+"
                 size_hint_x: None
-                width: 60  # BUTTON_WIDTH
-                height: 60  # Dopasowane do kategorii
-                background_color: 0, 1, 0, 1
+                width: 60
+                height: 60
+                background_color: 0, 0, 0, 0
                 on_press: app.show_add_category_screen()
+
+                canvas.before:
+                    Color:
+                        rgba: 0.3, 0.7, 1, 1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [15, 15, 15, 15]
 
             Button:
                 text: "S"
                 size_hint_x: None
-                width: 60  # BUTTON_WIDTH
-                height: 60  # Dopasowane do kategorii
-                background_color: 1, 1, 0, 1
+                width: 60
+                height: 60
+                background_color: 0, 0, 0, 0
                 on_press: app.show_search_screen()
 
+                canvas.before:
+                    Color:
+                        rgba: 0.1, 0.5, 1, 1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [15, 15, 15, 15]
+
         ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+
             BoxLayout:
                 id: category_list
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-                spacing: 10  # CATEGORY_SPACING
+                spacing: 10
 
 <LoadingScreen>:
     BoxLayout:

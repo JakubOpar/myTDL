@@ -1,21 +1,22 @@
-CATEGORY_HEIGHT = 60  # Wysokość wiersza kategorii
-CATEGORY_SPACING = 10  # Odstęp między elementami listy
-CATEGORY_PADDING = 5  # Padding w wierszu kategorii
-BUTTON_WIDTH = 60  # Szerokość przycisków
-
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
-from kivy.graphics import Color, Rectangle
+from kivy.graphics import Color, RoundedRectangle
+
+CATEGORY_HEIGHT = 60
+CATEGORY_SPACING = 10
+CATEGORY_PADDING = 5
+BUTTON_WIDTH = 60
+CORNER_RADIUS = [15, 15, 15, 15]
 
 def generate_categories(category_list_layout, categories, manage_callback, delete_callback):
-    print("Generowanie kategorii...")  # Debugowanie
+    print("Generowanie kategorii...")
     category_list_layout.clear_widgets()
 
     for category_name in categories:
-        print(f"Generowanie kategorii: {category_name}")  # Debugowanie
+        print(f"Generowanie kategorii: {category_name}")
 
-        # Główny kontener kategorii
+        # Główny kontener kategorii z tłem w canvas.before
         category_box = BoxLayout(
             orientation='horizontal',
             size_hint_y=None,
@@ -23,57 +24,52 @@ def generate_categories(category_list_layout, categories, manage_callback, delet
             spacing=CATEGORY_SPACING
         )
 
-        # Dodanie tła do kategorii
+        # Dodajemy tło BEZPOŚREDNIO do BoxLayout
         with category_box.canvas.before:
-            Color(1, 0.5, 0, 1)  # Pomarańczowy kolor RGBA
-            category_box.rect = Rectangle(size=category_box.size, pos=category_box.pos)
-            category_box.bind(
-                size=lambda instance, value: setattr(instance.rect, 'size', value),
-                pos=lambda instance, value: setattr(instance.rect, 'pos', value)
-            )
+            Color(0.2, 0.4, 0.8, 1)  # Niebieski kolor
+            category_box.rect = RoundedRectangle(pos=category_box.pos, size=category_box.size, radius=CORNER_RADIUS)
 
-        # Etykieta kategorii
+        # Wiązanie rozmiaru i pozycji tła do kontenera kategorii
+        category_box.bind(
+            size=lambda instance, value: setattr(instance.rect, 'size', instance.size),
+            pos=lambda instance, value: setattr(instance.rect, 'pos', instance.pos)
+        )
+
         category_label = Label(
             text=category_name,
             size_hint_x=0.6,
             valign="middle",
-            halign="left",
-            text_size=(None, None)
+            halign="left"
         )
 
-        # Przycisk zarządzania
-        manage_button = Button(
-            text="+",
-            size_hint_x=None,
-            width=BUTTON_WIDTH,
-            height=CATEGORY_HEIGHT - CATEGORY_PADDING,  # Dopasowanie wysokości do kontenera
-            background_color=(0, 0.5, 1, 1),
-            on_press=lambda instance, cat=category_name: manage_callback(cat)
-        )
+        def create_rounded_button(text, color, callback):
+            btn = Button(
+                text=text,
+                size_hint_x=None,
+                width=BUTTON_WIDTH,
+                height=CATEGORY_HEIGHT - CATEGORY_PADDING,
+                background_color=(0, 0, 0, 0)  # Przezroczyste tło
+            )
 
-        # Przycisk usuwania
-        delete_button = Button(
-            text="-",
-            size_hint_x=None,
-            width=BUTTON_WIDTH,
-            height=CATEGORY_HEIGHT - CATEGORY_PADDING,  # Dopasowanie wysokości do kontenera
-            background_color=(1, 0, 0, 1),
-            on_press=lambda instance, cat=category_name: delete_callback(cat)
-        )
+            with btn.canvas.before:
+                Color(*color)
+                btn.rect = RoundedRectangle(pos=btn.pos, size=btn.size, radius=CORNER_RADIUS)
 
-        # Dodanie elementów do kategorii
+            btn.bind(
+                size=lambda instance, value: setattr(btn.rect, 'size', instance.size),
+                pos=lambda instance, value: setattr(btn.rect, 'pos', instance.pos)
+            )
+
+            btn.bind(on_press=lambda instance: callback(category_name))
+            return btn
+
+        manage_button = create_rounded_button("+", (0.3, 0.7, 1, 1), manage_callback)
+        delete_button = create_rounded_button("-", (0.1, 0.5, 1, 1), delete_callback)
+
         category_box.add_widget(category_label)
         category_box.add_widget(manage_button)
         category_box.add_widget(delete_button)
 
-        # Dodanie kategorii do listy
         category_list_layout.add_widget(category_box)
 
-    print("Kategorie wygenerowane.")  # Debugowanie
-
-
-
-
-
-
-
+    print("Kategorie wygenerowane.")
