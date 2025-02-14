@@ -3,37 +3,38 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.graphics import Color, RoundedRectangle
 
-CATEGORY_HEIGHT = 60
-CATEGORY_SPACING = 10
-CATEGORY_PADDING = 5
+TASK_HEIGHT = 60
+TASK_SPACING = 10
+TASK_PADDING = 5
 BUTTON_WIDTH = 60
 CORNER_RADIUS = [15, 15, 15, 15]
 
-def generate_categories(category_list_layout, categories, task_callback, delete_callback):
-    print("Generowanie kategorii...")
-    category_list_layout.clear_widgets()
+def generate_tasks(task_list_layout, tasks, edit_callback, delete_callback):
+    print("Generowanie listy zadań...")
+    task_list_layout.clear_widgets()
 
-    for category_name in categories:
-        print(f"Generowanie kategorii: {category_name}")
+    for task in tasks:
+        task_id, task_name, priority, _, _, _, category_name = task
+        print(f"Generowanie zadania: {task_name} (Priorytet: {priority})")
 
-        category_box = BoxLayout(
+        task_box = BoxLayout(
             orientation='horizontal',
             size_hint_y=None,
-            height=CATEGORY_HEIGHT,
-            spacing=CATEGORY_SPACING
+            height=TASK_HEIGHT,
+            spacing=TASK_SPACING
         )
 
-        with category_box.canvas.before:
+        with task_box.canvas.before:
             Color(0.2, 0.4, 0.8, 1)  # Niebieski kolor
-            category_box.rect = RoundedRectangle(pos=category_box.pos, size=category_box.size, radius=CORNER_RADIUS)
+            task_box.rect = RoundedRectangle(pos=task_box.pos, size=task_box.size, radius=CORNER_RADIUS)
 
-        category_box.bind(
+        task_box.bind(
             size=lambda instance, value: setattr(instance.rect, 'size', instance.size),
             pos=lambda instance, value: setattr(instance.rect, 'pos', instance.pos)
         )
 
-        category_label = Label(
-            text=category_name,
+        task_label = Label(
+            text=f"{task_name} - Priorytet: {priority}",
             size_hint_x=0.6,
             valign="middle",
             halign="left"
@@ -44,7 +45,7 @@ def generate_categories(category_list_layout, categories, task_callback, delete_
                 text=text,
                 size_hint_x=None,
                 width=BUTTON_WIDTH,
-                height=CATEGORY_HEIGHT - CATEGORY_PADDING,
+                height=TASK_HEIGHT - TASK_PADDING,
                 background_color=(0, 0, 0, 0)  # Przezroczyste tło
             )
 
@@ -57,24 +58,23 @@ def generate_categories(category_list_layout, categories, task_callback, delete_
                 pos=lambda instance, value: setattr(btn.rect, 'pos', instance.pos)
             )
 
-            btn.bind(on_press=lambda instance: handle_button_press(callback, category_name))
+            btn.bind(on_press=lambda instance: handle_button_press(callback, task_id))
             return btn
 
-        def handle_button_press(callback, category_name):
-            print(f"🟢 Kliknięto przycisk w kategorii: {category_name}")
+        def handle_button_press(callback, task_id):
+            print(f"🟢 Kliknięto przycisk dla zadania ID: {task_id}")
             if callback:
-                callback(category_name)
+                callback(task_id)
             else:
                 print("🔴 BŁĄD: Nie ustawiono funkcji callback!")
 
-        task_button = create_rounded_button("+", (0.3, 0.7, 1, 1), task_callback)
+        edit_button = create_rounded_button("+", (0.3, 0.7, 1, 1), edit_callback)
         delete_button = create_rounded_button("-", (0.1, 0.5, 1, 1), delete_callback)
 
-        category_box.add_widget(category_label)
-        category_box.add_widget(task_button)
-        category_box.add_widget(delete_button)
+        task_box.add_widget(task_label)
+        task_box.add_widget(edit_button)
+        task_box.add_widget(delete_button)
 
-        category_list_layout.add_widget(category_box)
+        task_list_layout.add_widget(task_box)
 
-    print("Kategorie wygenerowane.")
-
+    print("Lista zadań wygenerowana.")

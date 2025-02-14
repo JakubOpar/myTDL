@@ -28,12 +28,12 @@
         BoxLayout:
             size_hint_y: None
             height: 65
-            size_hint_x: 0.7  # Skalowanie szerokości do ekranu
-            pos_hint: {"center_x": 0.5}  # Wycentrowanie
+            size_hint_x: 0.7
+            pos_hint: {"center_x": 0.5}
 
             canvas.before:
                 Color:
-                    rgba: 1, 1, 1, 1  # Białe tło pola tekstowego
+                    rgba: 1, 1, 1, 1
                 RoundedRectangle:
                     pos: self.pos
                     size: self.size
@@ -45,13 +45,13 @@
                 font_size: 18
                 foreground_color: 0, 0, 0, 1
                 background_color: 0, 0, 0, 0
-                size_hint_x: 1  # Dopasowanie do szerokości kontenera
+                size_hint_x: 1
                 height: 60
-                multiline: False  # Zapobiega przechodzeniu do nowej linii
+                multiline: False
                 padding: [15, 15, 15, 15]
-                halign: "center"  # Wyśrodkowanie poziome
-                valign: "middle"  # Wyśrodkowanie pionowe
-                text_size: self.size  # Tekst dostosowuje się do wielkości pola
+                halign: "center"
+                valign: "middle"
+                text_size: self.size
 
         Widget:
             size_hint_y: 1
@@ -185,6 +185,85 @@
             max: 100
             value: 50
 
+<TaskManagementScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        padding: 20
 
+        Label:
+            id: category_label
+            text: "Zadania dla kategorii"
+            font_size: 24
+            size_hint_y: None
+            height: 50
 
+        BoxLayout:
+            size_hint_y: None
+            height: 60
+            spacing: 10
+
+            Label:
+                size_hint_x: 0.6
+
+            Button:
+                text: "+"
+                size_hint_x: None
+                width: 60
+                height: 60
+                background_color: 0, 0, 0, 0
+                on_press: app.show_add_task_screen()
+
+                canvas.before:
+                    Color:
+                        rgba: 0.3, 0.7, 1, 1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [15, 15, 15, 15]
+
+            Button:
+                text: "S"
+                size_hint_x: None
+                width: 60
+                height: 60
+                background_color: 0, 0, 0, 0
+                on_press: app.show_search_task_screen()
+
+                canvas.before:
+                    Color:
+                        rgba: 0.1, 0.5, 1, 1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [15, 15, 15, 15]
+
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+
+            BoxLayout:
+                id: task_list
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: 10
+                padding: [0, 5, 0, 5]  # Dodanie małych odstępów czarnych
+
+        Button:
+            text: "Powrót"
+            size_hint: None, None
+            width: 150
+            height: 60
+            pos_hint: {"center_x": 0.5}
+            background_color: 0, 0, 0, 0
+            on_press: app.show_category_list_screen()
+
+            canvas.before:
+                Color:
+                    rgba: 0.1, 0.5, 1, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [15, 15, 15, 15]
 

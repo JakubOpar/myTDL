@@ -32,9 +32,22 @@ def initialize_database():
         INSERT OR IGNORE INTO categories (name) VALUES ('default')
     ''')
 
+    # Pobranie ID kategorii 'default'
+    cursor.execute('SELECT id FROM categories WHERE name = "default"')
+    default_category = cursor.fetchone()
+
+    if default_category:
+        category_id = default_category[0]
+
+        # Dodanie przykładowego zadania, jeśli jeszcze nie istnieje
+        cursor.execute('''
+            INSERT OR IGNORE INTO tasks (name, priority, task_date, reminder, description, category_id)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', ("Przykładowe zadanie", 3, "10-02-2025 14:00", "10-02-2025 13:30", "To jest testowe zadanie", category_id))
+
     conn.commit()
     conn.close()
-    print("Baza danych zainicjowana, kategoria 'default' dodana.")
+    print("Baza danych zainicjowana, kategoria 'default' oraz testowe zadanie zostały dodane.")
 
 
 
