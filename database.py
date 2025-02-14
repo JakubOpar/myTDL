@@ -6,6 +6,14 @@ def initialize_database():
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
 
+    # Usunięcie wszystkich danych z tabeli (reset)
+    cursor.execute("DELETE FROM tasks")
+    cursor.execute("DELETE FROM categories")
+
+    # Resetowanie autoinkrementacji (sprawia, że nowe ID zaczynają się od 1)
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='tasks'")
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='categories'")
+
     # Tworzenie tabel (jeśli jeszcze nie istnieją)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS categories (
@@ -27,27 +35,34 @@ def initialize_database():
         )
     ''')
 
-    # Dodanie kategorii "default" (jeśli jeszcze nie istnieje)
-    cursor.execute('''
-        INSERT OR IGNORE INTO categories (name) VALUES ('default')
-    ''')
+    # Przykładowe kategorie
+    example_categories = ['default', 'work', 'home', 'study']
+    for category in example_categories:
+        cursor.execute('INSERT INTO categories (name) VALUES (?)', (category,))
 
-    # Pobranie ID kategorii 'default'
-    cursor.execute('SELECT id FROM categories WHERE name = "default"')
-    default_category = cursor.fetchone()
+    conn.commit()
 
-    if default_category:
-        category_id = default_category[0]
+    # Pobranie ID wszystkich kategorii
+    cursor.execute('SELECT id, name FROM categories')
+    categories = cursor.fetchall()
 
-        # Dodanie przykładowego zadania, jeśli jeszcze nie istnieje
-        cursor.execute('''
-            INSERT OR IGNORE INTO tasks (name, priority, task_date, reminder, description, category_id)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', ("Przykładowe zadanie", 3, "10-02-2025 14:00", "10-02-2025 13:30", "To jest testowe zadanie", category_id))
+    # Dodanie przykładowych zadań do każdej kategorii
+    example_tasks = [
+        ("Zadanie dla {} - 1", 3, "10-02-2025 14:00", "10-02-2025 13:30", "Opis zadania 1"),
+        ("Zadanie dla {} - 2", 2, "12-02-2025 10:00", "12-02-2025 09:30", "Opis zadania 2"),
+        ("Zadanie dla {} - 3", 5, "15-02-2025 08:00", "15-02-2025 07:30", "Opis zadania 3")
+    ]
+
+    for category_id, category_name in categories:
+        for task in example_tasks:
+            cursor.execute('''
+                INSERT INTO tasks (name, priority, task_date, reminder, description, category_id)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (task[0].format(category_name), task[1], task[2], task[3], task[4], category_id))
 
     conn.commit()
     conn.close()
-    print("Baza danych zainicjowana, kategoria 'default' oraz testowe zadanie zostały dodane.")
+    print("✅ Baza danych ZRESETOWANA, autoinkrementacja zresetowana, przykładowe kategorie i zadania dodane.")
 
 
 
@@ -140,17 +155,24 @@ def add_task(name, priority, task_date, reminder, description, category_name):
 def get_tasks(order_by="priority"):
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
+
     if order_by not in ["priority", "task_date", "name"]:
         raise ValueError("Sortowanie może być według: 'priority', 'task_date', 'name'.")
+
     cursor.execute('''
-        SELECT tasks.id, tasks.name, tasks.priority, tasks.task_date, tasks.reminder, tasks.description, categories.name 
+        SELECT tasks.id, tasks.name, tasks.priority, tasks.task_date, tasks.reminder, tasks.description, categories.name
         FROM tasks
         JOIN categories ON tasks.category_id = categories.id
         ORDER BY tasks.{}
     '''.format(order_by))
+
     tasks = cursor.fetchall()
     conn.close()
+
+    print("🔎 Pobranie zadań z bazy:", tasks)  # Debugowanie
+
     return tasks
+
 
 
 # Aktualizacja zadania

@@ -9,12 +9,15 @@ CATEGORY_PADDING = 5
 BUTTON_WIDTH = 60
 CORNER_RADIUS = [15, 15, 15, 15]
 
+
 def generate_categories(category_list_layout, categories, task_callback, delete_callback):
-    print("Generowanie kategorii...")
+    """Generuje dynamiczną listę kategorii."""
+
+    print("🛠 Generowanie kategorii...")
     category_list_layout.clear_widgets()
 
     for category_name in categories:
-        print(f"Generowanie kategorii: {category_name}")
+        print(f"🎯 Generowanie kategorii: {category_name}")
 
         category_box = BoxLayout(
             orientation='horizontal',
@@ -39,7 +42,8 @@ def generate_categories(category_list_layout, categories, task_callback, delete_
             halign="left"
         )
 
-        def create_rounded_button(text, color, callback):
+        def create_rounded_button(text, color, callback, cat_name):
+            """Tworzy zaokrąglony przycisk z poprawnym przekazywaniem kategorii."""
             btn = Button(
                 text=text,
                 size_hint_x=None,
@@ -57,24 +61,28 @@ def generate_categories(category_list_layout, categories, task_callback, delete_
                 pos=lambda instance, value: setattr(btn.rect, 'pos', instance.pos)
             )
 
-            btn.bind(on_press=lambda instance: handle_button_press(callback, category_name))
+            # Poprawne przekazywanie wartości kategorii do callbacka
+            btn.bind(on_release=lambda instance: handle_button_press(callback, cat_name))
             return btn
 
-        def handle_button_press(callback, category_name):
-            print(f"🟢 Kliknięto przycisk w kategorii: {category_name}")
+        def handle_button_press(callback, cat_name):
+            """Obsługuje naciśnięcie przycisku, logując i wywołując przekazaną funkcję."""
+            print(f"🟢 Kliknięto przycisk w kategorii: {cat_name}")
             if callback:
-                callback(category_name)
+                callback(cat_name)
             else:
                 print("🔴 BŁĄD: Nie ustawiono funkcji callback!")
 
-        task_button = create_rounded_button("+", (0.3, 0.7, 1, 1), task_callback)
-        delete_button = create_rounded_button("-", (0.1, 0.5, 1, 1), delete_callback)
+        # Tworzymy przyciski z poprawnym przekazywaniem kategorii
+        task_button = create_rounded_button("+", (0.3, 0.7, 1, 1), task_callback, category_name)
+        delete_button = create_rounded_button("-", (0.1, 0.5, 1, 1), delete_callback, category_name)
 
+        # Dodajemy elementy do kontenera
         category_box.add_widget(category_label)
         category_box.add_widget(task_button)
         category_box.add_widget(delete_button)
 
+        # Dodajemy kontener kategorii do layoutu
         category_list_layout.add_widget(category_box)
 
-    print("Kategorie wygenerowane.")
-
+    print("✅ Kategorie wygenerowane.")
