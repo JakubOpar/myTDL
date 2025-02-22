@@ -58,13 +58,13 @@ def generate_tasks(task_list_layout, tasks, edit_callback, delete_callback):
                 pos=lambda instance, value: setattr(btn.rect, 'pos', instance.pos)
             )
 
-            btn.bind(on_press=lambda instance: handle_button_press(callback, task_id))
+            btn.bind(on_press=lambda instance: handle_button_press(callback, task_id, category_name))
             return btn
 
-        def handle_button_press(callback, task_id):
-            print(f"🟢 Kliknięto przycisk dla zadania ID: {task_id}")
+        def handle_button_press(callback, task_id, category_name):
+            print(f"🟢 Kliknięto przycisk dla zadania ID: {task_id} (Kategoria: {category_name})")
             if callback:
-                callback(task_id)
+                callback(task_id, category_name)
             else:
                 print("🔴 BŁĄD: Nie ustawiono funkcji callback!")
 
@@ -78,3 +78,4 @@ def generate_tasks(task_list_layout, tasks, edit_callback, delete_callback):
         task_list_layout.add_widget(task_box)
 
     print("Lista zadań wygenerowana.")
+

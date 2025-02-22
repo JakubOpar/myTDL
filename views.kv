@@ -267,3 +267,196 @@
                     size: self.size
                     radius: [15, 15, 15, 15]
 
+<EditTaskScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: [20, 10]
+        spacing: 10
+        size_hint_y: None
+        height: self.minimum_height
+        pos_hint: {"top": 1}
+
+        Label:
+            id: task_label
+            text: "Edytuj zadanie"
+            font_size: 20
+            size_hint_y: None
+            height: 40
+            color: (1,1,1,1)
+            bold: True
+            halign: "center"
+            valign: "middle"
+
+        GridLayout:
+            cols: 1
+            spacing: 10
+            size_hint_y: None
+            height: self.minimum_height
+
+            BoxLayout:
+                size_hint_y: None
+                height: 50
+                padding: [5, 5]
+                canvas.before:
+                    Color:
+                        rgba: (0.2, 0.2, 0.2, 1)
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [15, 15, 15, 15]
+
+                TextInput:
+                    id: task_name
+                    hint_text: "Nazwa zadania"
+                    size_hint_x: 1
+                    size_hint_y: None
+                    height: 50
+                    foreground_color: (1, 1, 1, 1)
+                    background_color: (0, 0, 0, 0)
+                    padding: [16, 16]
+                    multiline: False
+                    font_size: 16
+
+            BoxLayout:
+                size_hint_y: None
+                height: 50
+                padding: [5, 5]
+                canvas.before:
+                    Color:
+                        rgba: (0.2, 0.2, 0.2, 1)
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [15, 15, 15, 15]
+
+                TextInput:
+                    id: task_priority
+                    hint_text: "Priorytet (1-5)"
+                    size_hint_x: 1
+                    size_hint_y: None
+                    height: 50
+                    foreground_color: (1, 1, 1, 1)
+                    background_color: (0, 0, 0, 0)
+                    padding: [16, 16]
+                    multiline: False
+                    font_size: 16
+
+            BoxLayout:
+                size_hint_y: None
+                height: 50
+                padding: [5, 5]
+                canvas.before:
+                    Color:
+                        rgba: (0.2, 0.2, 0.2, 1)
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [15, 15, 15, 15]
+
+                TextInput:
+                    id: task_date
+                    hint_text: "Data zadania (DD-MM-YYYY HH:MM)"
+                    size_hint_x: 1
+                    size_hint_y: None
+                    height: 50
+                    foreground_color: (1, 1, 1, 1)
+                    background_color: (0, 0, 0, 0)
+                    padding: [16, 16]
+                    multiline: False
+                    font_size: 16
+
+            BoxLayout:
+                size_hint_y: None
+                height: 50
+                padding: [5, 5]
+                canvas.before:
+                    Color:
+                        rgba: (0.2, 0.2, 0.2, 1)
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [15, 15, 15, 15]
+
+                TextInput:
+                    id: task_reminder
+                    hint_text: "Przypomnienie (DD-MM-YYYY HH:MM)"
+                    size_hint_x: 1
+                    size_hint_y: None
+                    height: 50
+                    foreground_color: (1, 1, 1, 1)
+                    background_color: (0, 0, 0, 0)
+                    padding: [16, 16]
+                    multiline: False
+                    font_size: 16
+
+            BoxLayout:
+                size_hint_y: None
+                height: 80
+                padding: [5, 5]
+                canvas.before:
+                    Color:
+                        rgba: (0.2, 0.2, 0.2, 1)
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [15, 15, 15, 15]
+
+                TextInput:
+                    id: task_description
+                    hint_text: "Opis zadania"
+                    size_hint_x: 1
+                    size_hint_y: None
+                    height: 80
+                    foreground_color: (1, 1, 1, 1)
+                    background_color: (0, 0, 0, 0)
+                    padding: [16, 16]
+                    font_size: 16
+                    multiline: True
+
+        Label:
+            id: category_label
+            text: "Kategoria: "
+            font_size: 18
+            size_hint_y: None
+            height: 30
+            color: (1,1,1,1)
+            halign: "center"
+            valign: "middle"
+            bold: True
+
+        BoxLayout:
+            size_hint_y: None
+            height: 60
+            spacing: 10
+
+            Button:
+                id: save_button
+                text: "Zapisz"
+                size_hint_y: None
+                height: 50
+                font_size: 16
+                background_color: (0.1, 0.5, 0.9, 1)
+                color: (1, 1, 1, 1)
+                bold: True
+                on_press:
+                    app.save_task_changes(app.current_task_id, task_name.text, task_priority.text, task_date.text, task_reminder.text, task_description.text, app.selected_category)
+
+            Button:
+                id: cancel_button
+                text: "Anuluj"
+                size_hint_y: None
+                height: 50
+                font_size: 16
+                background_color: (0.7, 0.1, 0.1, 1)
+                color: (1, 1, 1, 1)
+                bold: True
+                on_press:
+                    app.show_task_management_screen(app.selected_category)
+
+
+
+
+
+
+
+

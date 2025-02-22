@@ -3,7 +3,8 @@ import sqlite3
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
-from database import initialize_database, add_category, delete_category, get_categories, get_tasks, delete_task
+from database import initialize_database, add_category, delete_category, get_categories, get_tasks, delete_task, \
+    update_task
 from kivy.lang import Builder
 from kivy.core.window import Window
 from dynamic_categories import generate_categories
@@ -40,6 +41,8 @@ class TaskManagementScreen(Screen):
 class LoadingScreen(Screen):
     pass
 
+class EditTaskScreen(Screen):
+    pass
 
 class TaskManagerApp(App):
     def __init__(self, **kwargs):
@@ -62,6 +65,7 @@ class TaskManagerApp(App):
         self.sm.add_widget(DeleteCategoryScreen(name='delete_category'))
         self.sm.add_widget(CategoryListScreen(name='category_list'))
         self.sm.add_widget(TaskManagementScreen(name='task_management'))  # WAŻNE!
+        self.sm.add_widget(EditTaskScreen(name='edit_task'))
 
         print("Dodane ekrany:", [screen.name for screen in self.sm.screens])
 
@@ -157,8 +161,8 @@ class TaskManagerApp(App):
         generate_tasks(
             task_list_layout,
             category_tasks,
-            lambda task_id: self.edit_task(task_id, category_name),
-            lambda task_id: self.delete_task(task_id, category_name)
+            lambda task_id, cat_name: self.edit_task(task_id, cat_name),
+            lambda task_id, cat_name: self.delete_task(task_id, cat_name)
         )
 
         print(f"📌 Załadowano {len(category_tasks)} zadań dla kategorii {category_name}")
@@ -197,23 +201,88 @@ class TaskManagerApp(App):
     def manage_tasks(self, category_name):
         self.show_task_management_screen(category_name)
 
-    def delete_task(self, task_id):
-        """Usuwanie zadania i odświeżanie listy zadań w danej kategorii."""
-        if not self.current_category:
-            print("🔴 BŁĄD: Nie można usunąć zadania - brak wybranej kategorii!")
+    def delete_task(self, task_id, category_name):
+        """Usuwa zadanie i odświeża ekran zarządzania zadaniami."""
+        print(f"🗑 Usuwanie zadania ID: {task_id} z kategorii {category_name}")
+
+        delete_task(task_id)  # Usunięcie zadania z bazy danych
+
+        # Odświeżenie ekranu z listą zadań
+        self.show_task_management_screen(category_name)
+
+    def edit_task(self, task_id, category_name):
+        """Przechodzi do ekranu edycji zadania."""
+        print(f"✎ Edycja zadania ID: {task_id} w kategorii {category_name}")
+
+        self.sm.current = 'loading'
+        Clock.schedule_once(lambda dt: self._load_edit_task_screen(task_id, category_name), 0.3)
+
+    def _load_edit_task_screen(self, task_id, category_name):
+        """Ładuje ekran edycji zadania."""
+        print(f"📌 Ładowanie ekranu edycji dla zadania ID: {task_id} (Kategoria: {category_name})")
+
+        self.sm.current = 'edit_task'
+        screen = self.sm.get_screen('edit_task')
+
+        # Pobranie danych zadania z bazy
+        tasks = get_tasks()
+        task_data = next((t for t in tasks if t[0] == task_id), None)
+
+        if not task_data:
+            print(f"⚠️ Nie znaleziono zadania ID {task_id}")
             return
 
-        print(f"🗑 Usuwanie zadania ID: {task_id}")
-        delete_task(task_id)
-        self.show_task_management_screen(self.current_category)  # Odświeżenie ekranu dla właściwej kategorii
+        print(f"✅ Załadowano dane zadania: {task_data}")  # Debugowanie
 
-    def edit_task(self, task_id):
-        """Edytowanie zadania - na razie tylko wyświetla komunikat."""
-        if not self.current_category:
-            print("🔴 BŁĄD: Nie można edytować zadania - brak wybranej kategorii!")
-            return
+        # Wypełnienie pól edycyjnych
+        screen.ids.task_name.text = str(task_data[1]) if task_data[1] else ""
+        screen.ids.task_priority.text = str(task_data[2]) if task_data[2] else ""
+        screen.ids.task_date.text = str(task_data[3]) if task_data[3] else ""
+        screen.ids.task_reminder.text = str(task_data[4]) if task_data[4] else ""
+        screen.ids.task_description.text = str(task_data[5]) if task_data[5] else ""
 
-        print(f"✎ Edycja zadania ID: {task_id} w kategorii {self.current_category}")
+        print(f"📌 Wpisano do pól: {screen.ids.task_name.text}, {screen.ids.task_priority.text}, {screen.ids.task_date.text}")
+
+        # Przypisanie funkcji do przycisku zapisu
+        screen.ids.save_button.bind(
+            on_press=lambda instance: self.save_task_changes(
+                task_id,
+                screen.ids.task_name.text,
+                screen.ids.task_priority.text,
+                screen.ids.task_date.text,
+                screen.ids.task_reminder.text,
+                screen.ids.task_description.text,
+                category_name
+            )
+        )
+
+        # Przypisanie funkcji do przycisku powrotu
+        screen.ids.cancel_button.bind(
+            on_press=lambda instance: self.show_task_management_screen(category_name)
+        )
+
+
+    def save_task_changes(self, task_id, name, priority, task_date, reminder, description, category_name):
+        """Zapisuje zmiany w zadaniu i wraca do ekranu z listą zadań."""
+        print(f"💾 Zapisywanie zmian w zadaniu ID {task_id}")
+
+        try:
+            update_task(
+                task_id,
+                name=name,
+                priority=int(priority),
+                task_date=task_date,
+                reminder=reminder,
+                description=description,
+                category_name=category_name
+            )
+            print("✅ Zmiany zapisane.")
+        except Exception as e:
+            print(f"❌ Błąd podczas zapisu zmian: {e}")
+
+        # Powrót do listy zadań po zapisaniu
+        self.show_task_management_screen(category_name)
+
 
 
 if __name__ == "__main__":
